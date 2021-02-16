@@ -1,0 +1,16 @@
+.barra {
+    background-color: #212121;
+    opacity: 0.9;
+    color: white;
+}
+
+.color:hover {
+    background: rgba(102, 187, 106, 0.5);
+    color: white;
+    text-decoration: none;
+}
+
+.logo {
+    margin-left: 1vw;
+    top: 10px;
+}

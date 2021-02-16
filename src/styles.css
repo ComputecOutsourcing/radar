@@ -1,1 +1,52 @@
-/* You can add global styles to this file, and also import other style files */
+    /* footer {
+    color: white;
+    background-color: #212121;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+} */
+    
+    .posicionSidebar {
+        position: static;
+        width: 170px;
+    }
+    
+    .posicionPagina {
+        position: absolute;
+        top: 20px;
+        left: 180px;
+        right: 10px;
+    }
+    
+    body {
+        font-family: sans-serif;
+        font-size: 14px;
+        background: #f2f2f2;
+    }
+    
+    .animated {
+        -webkit-animation-duration: 1s;
+        animation-duration: 1s;
+        -webkit-animation-fill-mode: both;
+        animation-fill-mode: both;
+    }
+    
+    .fast {
+        -webkit-animation-duration: 0.4s;
+        animation-duration: 0.4s;
+        -webkit-animation-fill-mode: both;
+        animation-fill-mode: both;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    .fadeIn {
+        animation-name: fadeIn;
+    }

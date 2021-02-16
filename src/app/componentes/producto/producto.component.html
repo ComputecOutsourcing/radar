@@ -1,0 +1,353 @@
+<div class="animated fadeIn fast posicionPagina">
+
+    <!--Filtro-->
+    <form class=" panel ">
+        <h4>Filtros</h4>
+        <div class="row">
+            <div class="form-group col-8">
+                <label>Cliente</label>
+                <select class="form-select form-select-sm" type="text">
+                    <option *ngFor=" let cli of cliente " [value]="cli.codigo ">
+                        {{cli.nombre|titlecase}}
+                    </option>
+                </select>
+            </div>
+            <div class="col col-2">
+                <label>Fecha Inicio</label>
+                <input type="date" class="form-control form-control-sm">
+            </div>
+            <div class="col col-2">
+                <label>Fecha Fin</label>
+                <input type="date" class="form-control form-control-sm">
+            </div>
+            <div class="col" align="right">
+                <button type="button" class="btn botonConsulta ">
+            Consultar
+        </button>
+            </div>
+        </div>
+    </form>
+
+    <!--Boton crear producto-->
+    <div class="col" align="right" data-toggle="modal" data-target="#ventanaCrearProducto">
+        <button type="button" class="btn botonCrear" (click)="crearFormulario()">
+            Crear Producto
+        </button>
+    </div>
+
+    <!--Tabla-->
+
+    <table class="table table-bordered posicionTabla table-sm">
+
+        <thead class="table-secondary ">
+            <h4 style="padding-left: 15px;"> Resultados</h4>
+            <tr>
+                <th scope="col" class="text-center">Fecha de <br> Creación</th>
+                <th scope="col" class="text-center">Código de <br> Cliente</th>
+                <th scope="col" class="text-center">Razón Social Cliente</th>
+                <th scope="col" class="text-center">Código de Producto</th>
+                <th scope="col" class="text-center">Descripción de Producto</th>
+                <th scope="col" class="text-center">Estado</th>
+                <th scope="col" class="text-center">Parametros <br> Consulta</th>
+                <th scope="col" class="text-center">Editar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="text-center">
+                <td>asdfghjklñ</td>
+                <td>asdfghjklñ</td>
+                <td>asdfghjklñ</td>
+                <td>asdfghjklñ</td>
+                <td>asdfghjklñ</td>
+                <td>asdfghjklñ</td>
+                <td>asdfghjklñ</td>
+
+                <td class="text-center ">
+                    <button class="btn btn-success botonEditar" type="button" data-toggle="modal" data-target="#ventanaEditarProducto" (click)="editarFormulario()">
+                    <img  src="assets/icon/editar.png" />
+                </button>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+
+</div>
+
+<!-- Model para crear Producto -->
+<div class="modal fade tamanoLetra " id="ventanaCrearProducto" tabindex="-1" role="dialog" aria-labelledby="tituloVentanaCrearProducto" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-body">
+
+                <form [formGroup]="forma" (ngSubmit)='guardarCrear()'>
+                    <h5 id="tituloVentanaCrearProducto">Crear Producto</h5>
+                    <hr class="linea">
+
+                    <div class="row">
+                        <div class="col-4">
+                            <label>Código Producto</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="codigoProducto" [class.is-invalid]="codigoProductoNoValido">
+                        </div>
+                        <div class="col-4">
+                            <label>Fecha de Creación</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="fechaCreacion" [class.is-invalid]="fechaCreacionNoValido">
+                        </div>
+                        <div class="col-4">
+                            <label>Estado</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="estado" [class.is-invalid]="estadoNoValido">
+                        </div>
+                        <div class="form-group col-3">
+                            <label><span class="text-danger">*</span>llave de Cruce</label>
+                            <select class="form-select form-select-sm" autocomplete="on" formControlName="llaveCruce" [class.is-invalid]="llaveCruceNoValido">
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                            <small *ngIf="llaveCruceNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="form-group col-9">
+                            <label><span class="text-danger">*</span>Cliente</label>
+                            <select class="form-select form-select-sm" type="text" formControlName="cliente" [class.is-invalid]="clienteNoValido">
+                                <option *ngFor=" let cli of cliente " [value]="cli.codigo " (click)="servicioCliente() ">
+                                    {{cli.nombre|titlecase}}
+                                </option>
+                            </select>
+                            <small *ngIf="clienteNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="form-group col-12">
+                            <label><span class="text-danger">*</span>Descripción Producto</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="descripcionProducto" [class.is-invalid]="descripcionProductoNoValido">
+                        </div>
+                        <small *ngIf="descripcionProductoNoValido" class="text-danger">
+                            Diligenciar Campo
+                        </small>
+                        <div class="form-group col-4">
+                            <label><span class="text-danger">*</span>Departamento</label>
+                            <select class="form-select form-select-sm" type="text" formControlName="departamento" [class.is-invalid]="departamentoNoValido" placeholder="Seleccione Departamento">
+                                <option *ngFor="let dep of departamento " [value]="dep.codigo" (click)="servicioMunicipio()">
+                                    {{dep.nombre|titlecase}}
+                                </option>
+                            </select>
+                            <small *ngIf="departamentoNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="form-group col-4">
+                            <label><span class="text-danger">*</span>Municipio</label>
+                            <select class="form-select form-select-sm" type="text" formControlName="municipio" [class.is-invalid]="municipioNoValido">
+                                <option *ngFor="let mun of municipio " [value]="mun.codigo">
+                                    {{mun.nombre|titlecase}}
+                                </option>
+                            </select>
+                            <small *ngIf="municipioNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="form-group col-4">
+                            <label><span class="text-danger">*</span>Centro Poblado</label>
+                            <select class="form-select form-select-sm" type="text" formControlName="centroPoblado" [class.is-invalid]="centroPobladoNoValido">
+                                <option *ngFor="let cp of centroPoblado" [value]="cp.codigo">
+                                    {{cp.nombre|titlecase}}
+                                </option>
+                            </select>
+                            <small *ngIf="centroPobladoNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <label>Nombre Contacto</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="nombreContacto" [class.is-invalid]="nombreContactoNoValido">
+                        </div>
+                        <div class="col-6">
+                            <label>Email</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="email" [class.is-invalid]="emailNoValido">
+                        </div>
+                        <div class="form-group col-3">
+                            <label>Tipo de Cobro</label>
+                            <select class="form-select form-select-sm" type="text">
+                                <option *ngFor=" let tc of tipoCobro " [value]="tc">
+                                    {{tc}}
+                                </option>
+                            </select>
+                        </div>
+
+                        <h6 class="parametros">Parametros de Consulta</h6>
+
+                        <!-- <div class="col-6">
+                            <label>Nombre Campo</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="nombreCampo" [class.is-invalid]="nombreCampoNoValido">
+                        </div>
+                        <div class="col-6">
+                            <label>Alias</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="alias" [class.is-invalid]="aliasNoValido">
+                        </div> -->
+
+                    </div>
+
+                    <hr class="linea">
+
+                    <div class="form-group col-2">
+                        <div class="input-group ">
+                            <button class="btn botonGuardar" type="submit">Guardar</button>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group col-2">
+                        <div class="input-group ">
+                            <button class="btn btn-danger botonCancelar" type="button" data-dismiss="modal" (click)="cancelar()">Cancelar</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Model para editar Producto -->
+<div class="modal fade tamanoLetra " id="ventanaEditarProducto" tabindex="-1" role="dialog" aria-labelledby="tituloVentanaEditarProducto" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-body">
+
+                <form [formGroup]="forma" (ngSubmit)='guardarEditar()'>
+                    <h5 id="tituloVentanaEditarProducto">Editar Producto</h5>
+                    <hr class="linea">
+
+                    <div class="row">
+                        <div class="col-4">
+                            <label>Código Producto</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="codigoProducto" [class.is-invalid]="codigoProductoNoValido">
+                        </div>
+                        <div class="col-4">
+                            <label>Fecha de Creación</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="fechaCreacion" [class.is-invalid]="fechaCreacionNoValido">
+                        </div>
+                        <div class="col-4">
+                            <label>Estado</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="estado" [class.is-invalid]="estadoNoValido">
+                        </div>
+                        <div class="form-group col-3">
+                            <label><span class="text-danger">*</span>llave de Cruce</label>
+                            <select class="form-select form-select-sm" autocomplete="on" formControlName="llaveCruce" [class.is-invalid]="llaveCruceNoValido">
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                            <small *ngIf="llaveCruceNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="form-group col-9">
+                            <label><span class="text-danger">*</span>Cliente</label>
+                            <select class="form-select form-select-sm" type="text" formControlName="cliente" [class.is-invalid]="clienteNoValido">
+                                <option *ngFor=" let cli of cliente " [value]="cli.codigo " (click)="servicioCliente() ">
+                                    {{cli.nombre|titlecase}}
+                                </option>
+                            </select>
+                            <small *ngIf="clienteNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="form-group col-12">
+                            <label><span class="text-danger">*</span>Descripción Producto</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="descripcionProducto" [class.is-invalid]="descripcionProductoNoValido">
+                        </div>
+                        <small *ngIf="descripcionProductoNoValido" class="text-danger">
+                            Diligenciar Campo
+                        </small>
+                        <div class="form-group col-4">
+                            <label><span class="text-danger">*</span>Departamento</label>
+                            <select class="form-select form-select-sm" type="text" formControlName="departamento" [class.is-invalid]="departamentoNoValido" placeholder="Seleccione Departamento">
+                                <option *ngFor="let dep of departamento " [value]="dep.codigo" (click)="servicioMunicipio()">
+                                    {{dep.nombre|titlecase}}
+                                </option>
+                            </select>
+                            <small *ngIf="departamentoNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="form-group col-4">
+                            <label><span class="text-danger">*</span>Municipio</label>
+                            <select class="form-select form-select-sm" type="text" formControlName="municipio" [class.is-invalid]="municipioNoValido">
+                                <option *ngFor="let mun of municipio " [value]="mun.codigo">
+                                    {{mun.nombre|titlecase}}
+                                </option>
+                            </select>
+                            <small *ngIf="municipioNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="form-group col-4">
+                            <label><span class="text-danger">*</span>Centro Poblado</label>
+                            <select class="form-select form-select-sm" type="text" formControlName="centroPoblado" [class.is-invalid]="centroPobladoNoValido">
+                                <option *ngFor="let cp of centroPoblado" [value]="cp.codigo">
+                                    {{cp.nombre|titlecase}}
+                                </option>
+                            </select>
+                            <small *ngIf="centroPobladoNoValido" class="text-danger">
+                                Diligenciar Campo
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <label>Nombre Contacto</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="nombreContacto" [class.is-invalid]="nombreContactoNoValido">
+                        </div>
+                        <div class="col-6">
+                            <label>Email</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="email" [class.is-invalid]="emailNoValido">
+                        </div>
+                        <div class="form-group col-3">
+                            <label>Tipo de Cobro</label>
+                            <select class="form-select form-select-sm" type="text">
+                                <option *ngFor=" let tc of tipoCobro " [value]="tc">
+                                    {{tc}}
+                                </option>
+                            </select>
+                        </div>
+
+                        <h6 class="parametros">Parametros de Consulta</h6>
+
+                        <!-- <div class="col-6">
+                            <label>Nombre Campo</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="nombreCampo" [class.is-invalid]="nombreCampoNoValido">
+                        </div>
+                        <div class="col-6">
+                            <label>Alias</label>
+                            <input class="form-control form-control-sm" type="text" formControlName="alias" [class.is-invalid]="aliasNoValido">
+                        </div> -->
+
+                    </div>
+                    <hr class="linea">
+
+                    <div class="form-group col-2">
+                        <div class="input-group ">
+                            <button class="btn botonGuardar" type="submit">Guardar</button>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group col-2">
+                        <div class="input-group ">
+                            <button class="btn btn-danger botonCancelar" type="button" data-dismiss="modal" (click)="cancelar()">Cancelar</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>

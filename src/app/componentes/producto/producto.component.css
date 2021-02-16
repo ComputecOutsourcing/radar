@@ -1,0 +1,64 @@
+.panel {
+    padding: 15px;
+    background: white;
+    border-radius: 15px;
+    padding-top: 5px;
+    font-size: 13px;
+}
+
+.botonCrear {
+    position: absolute;
+    top: 170px;
+    left: 0px;
+    background: rgba(102, 187, 106);
+    color: white;
+}
+
+.botonConsulta {
+    margin-top: 5px;
+    background: rgba(102, 187, 106);
+    color: white;
+}
+
+.botonEditar {
+    background: rgba(102, 187, 106);
+}
+
+.botonGuardar {
+    position: absolute;
+    background: rgba(102, 187, 106);
+    color: white;
+}
+
+.botonCancelar {
+    background: rgba(228, 79, 47);
+    top: -19px;
+    left: 100px;
+}
+
+.posicionTabla {
+    position: absolute;
+    top: 220px;
+    background: white;
+    font-size: 13px;
+    border-radius: 15px;
+}
+
+.colorFondo {
+    background: rgba(102, 187, 106, 0.2);
+}
+
+.tamanoLetra {
+    font-size: 13px;
+}
+
+.parametros {
+    background: rgba(102, 187, 106, 0.2);
+    padding: 9px;
+    margin-top: 9px;
+}
+
+.linea {
+    height: 3px;
+    background: rgba(102, 187, 106);
+}
