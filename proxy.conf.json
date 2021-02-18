@@ -1,0 +1,8 @@
+{
+    "/api/*": {
+        "target": "https://felec.computec.com/clienteproducto",
+        "secure": false,
+        "logLevel": "debug"
+
+    }
+}

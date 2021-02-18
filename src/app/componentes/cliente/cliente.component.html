@@ -3,33 +3,40 @@
     <!--Filtro-->
     <form class=" panel ">
         <h4>Filtros</h4>
-        <div class="row">
-            <div class="col col-2 ">
-                <label>Código</label>
-                <input type="number" class="form-control form-control-sm">
+        <form [formGroup]="formaFiltro" (ngSubmit)='guardarFiltro()'>
+            <div class="row">
+
+                <div class="col col-2 ">
+                    <label>Código</label>
+                    <input type="number" class="form-control form-control-sm" formControlName="codigoCliente">
+                </div>
+                <div class="col col-2">
+                    <label>Número Identificación</label>
+                    <input type="number" class="form-control form-control-sm" formControlName="numeroIdentificacion">
+                </div>
+                <div class="col col-4 ">
+                    <label>Razón Social</label>
+                    <select class="form-select form-select-sm " type="text" formControlName="razonSocial" placeholder="Seleccione Departamento">
+                        <option *ngFor="let cli of cliente " [value]="cli.nombre">
+                            {{cli.nombre|titlecase}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col col-2">
+                    <label>Fecha Inicio</label>
+                    <input type="date" class="form-control form-control-sm" formControlName="fechaInicio">
+                </div>
+                <div class="col col-2">
+                    <label>Fecha Fin</label>
+                    <input type="date" class="form-control form-control-sm" value="$fechaActual()" formControlName="fechaFin">
+                </div>
+                <div class="col" align="right">
+                    <button type="button" class="btn botonConsulta " type="submit">
+                        Consultar
+                    </button>
+                </div>
             </div>
-            <div class="col col-2">
-                <label>Número Identificación</label>
-                <input type="number" class="form-control form-control-sm">
-            </div>
-            <div class="col col-4">
-                <label>Razón Social</label>
-                <input type="text" class="form-control form-control-sm">
-            </div>
-            <div class="col col-2">
-                <label>Fecha Inicio</label>
-                <input type="date" class="form-control form-control-sm">
-            </div>
-            <div class="col col-2">
-                <label>Fecha Fin</label>
-                <input type="date" class="form-control form-control-sm">
-            </div>
-            <div class="col" align="right">
-                <button type="button" class="btn botonConsulta ">
-                Consultar
-            </button>
-            </div>
-        </div>
+        </form>
     </form>
 
     <!--Boton crear cliente-->
@@ -110,7 +117,7 @@
                         </div>
                         <div class="form-group col-3">
                             <label><span class="text-danger">*</span>Tipo de Identificación</label>
-                            <select class="form-select form-select-sm" autocomplete="on" formControlName="tipoIdentificacion" [class.is-invalid]="tipoIdentificacionNoValido">
+                            <select class="form-select form-select-sm " autocomplete="on" formControlName="tipoIdentificacion" [class.is-invalid]="tipoIdentificacionNoValido">
                                 <option *ngFor="let ti of tipoIdentificacion " [value]="ti.codigo">
                                     {{ti.nombre}}
                                 </option>
@@ -118,14 +125,17 @@
                         </div>
                         <div class="form-group col-3">
                             <label><span class="text-danger">*</span>Numero de Identificación</label>
-                            <input class="form-control form-control-sm" type="text" formControlName="numeroIdentificacion" [class.is-invalid]="numeroIdentificacionNoValido">
+                            <input class="form-control form-control-sm" type="numbre" min="0" formControlName="numeroIdentificacion" [class.is-invalid]="numeroIdentificacionNoValido">
                             <small *ngIf="numeroIdentificacionNoValido" class="text-danger">
                                 Diligenciar Campo
+                            </small>
+                            <small *ngIf="this.forma.get('numeroIdentificacion').errors?.validarIdentificacion" class="text-danger">
+                                Existe
                             </small>
                         </div>
                         <div class="form-group col-6">
                             <label><span class="text-danger">*</span>Razón Social</label>
-                            <input class="form-control form-control-sm" type="text" formControlName="razonSocial" [class.is-invalid]="razonSocialNoValido">
+                            <input class="form-control form-control-sm" type="text" maxlength="40" formControlName="razonSocial" [class.is-invalid]="razonSocialNoValido">
                             <small *ngIf="razonSocialNoValido" class="text-danger">
                                 Diligenciar Campo
                             </small>
@@ -136,7 +146,7 @@
                         </div>
                         <div class="col-3">
                             <label>Teléfono</label>
-                            <input class="form-control form-control-sm" type="text" formControlName="telefono" [class.is-invalid]="telefonoNoValido">
+                            <input class="form-control form-control-sm" type="number" formControlName="telefono" [class.is-invalid]="telefonoNoValido">
                         </div>
                         <div class="form-group col-4">
                             <label><span class="text-danger">*</span>Departamento</label>
@@ -174,8 +184,8 @@
                         <div class="col-4">
                             <label>Sector</label>
                             <select class="form-select form-select-sm" autocomplete="on" formControlName="sector" type="text" [class.is-invalid]="sectorNoValido">
-                                <option *ngFor="let sec of sector " [value]="sec">
-                                    {{sec}}
+                                <option *ngFor="let sec of sector " [value]="sec.valor">
+                                    {{sec.indice}}
                                 </option>
                             </select>
                         </div>

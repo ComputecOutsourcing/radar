@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import { map } from 'rxjs/operators';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
 })
+
+
 export class serviciosService {
 
   constructor(private http:HttpClient) { }
@@ -37,7 +40,9 @@ export class serviciosService {
     return resp.map(cliente => {
       return {
         codigo: cliente.codigoCliente,
-        nombre: cliente.descripcionCliente}
+        nombre: cliente.descripcionCliente,
+        numeroIdentificacion: cliente.numeroIdentificacion
+      }
     });
   }));}
 
@@ -49,5 +54,13 @@ export class serviciosService {
     });
   }));}
 
+  getCodigo(url:string){return this.http.get(url)}
 
+  postConsultaCliente(url:string, json:any){
+    return this.http.post(url,json)
+  }
+
+
+  //VALIDADORES
+    
 }

@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, NumberValueAccessor, Validators } from '@angular/forms';
 import { serviciosService } from '../../servicios/servicios.service';
+import { Observable } from 'rxjs';
 declare var $: any;
 
-
+interface ErrorValidate{
+  [s:string]:boolean
+}
 
 @Component({
   selector: 'app-cliente',
@@ -13,10 +16,24 @@ declare var $: any;
 export class ClienteComponent implements OnInit {
 
   forma: FormGroup;
+  formaFiltro: FormGroup;
+  codigo:any;
   departamento:any[] = [];
   municipio:any[] = [];
   centroPoblado:any[] = [];
-  sector:any[] = ['FI', 'FO','OT','SA','SP','TE'];
+  cliente:any[] = [];
+  
+  sector:any[] = [
+    {valor:'', indice:''},
+    {valor:'FI', indice:'FI'}, 
+    {valor:'FO', indice:'FO'},
+    {valor:'OT', indice:'OT'},
+    {valor:'SA', indice:'SA'},
+    {valor:'SP', indice:'SP'},
+    {valor:'TE', indice:'TE'},
+    {valor: null, indice: 'Null'}];
+  cod:any;
+  id:any[]=[];
   tipoIdentificacion:any[] = [
     {codigo:0,nombre:'Tipo no Identificado',abreviatura:'NA'},
     {codigo:1,nombre:'NIT',abreviatura:'NT'},
@@ -35,10 +52,14 @@ export class ClienteComponent implements OnInit {
     {codigo:14,nombre:'Num Unico Identif Personal',abreviatura:'NU'}];
 
   constructor(private fb: FormBuilder, private serviciosService:serviciosService) {
+    this.servicioCodigoCliente();
+    this.filtro();
     this.nuevo();
     this.servicioDepartamento();
     this.servicioMunicipio('0');
     this.servicioCentroPoblado('0','0');
+    this.servicioCliente();
+   
   }
 
   ngOnInit(): void {}
@@ -60,16 +81,44 @@ export class ClienteComponent implements OnInit {
     })
   }
 
+  //FILTRO
+
+  filtro(){
+    this.formaFiltro = this.fb.group(
+    {codigoCliente : '',    
+    numeroIdentificacion : '',     
+    razonSocial : '',     
+    fechaInicio : '',     
+    fechaFin : ''})
+  }
+
+  guardarFiltro() {
+    if (this.formaFiltro.invalid) {
+      return Object.values(this.formaFiltro.controls).forEach(control => {
+        if (control instanceof FormGroup) {
+          Object.values(control.controls).forEach(control => control.markAsTouched());
+        } else {
+          control.markAsTouched();
+        }
+      });
+    }
+    this.servicioConsultaCliente(this.formaFiltro.value);
+    this.formaFiltro.reset({});
+
+  }
+
   // CREAR FORMULARIO
 
   crearFormulario() {
   this.forma.get('tipoIdentificacion').enable();
   this.forma.get('numeroIdentificacion').enable();
+  this.servicioCodigoCliente();
+  this.servicioCliente();
     this.forma = this.fb.group({
-      codigoCliente: ['12345', [Validators.required]],
+      codigoCliente: [this.cod, [Validators.required]],
       fechaCreacion: [this.fechaActual(), [Validators.required]],
       estado: ['N', [Validators.required]],
-      tipoIdentificacion: [this.tipoIdentificacion[0].codigo, [Validators.required]],
+      tipoIdentificacion: [this.tipoIdentificacion[1].codigo, [Validators.required]],
       numeroIdentificacion: ['', [Validators.required]],
       razonSocial: ['', [Validators.required]],
       direccion: [''],
@@ -77,10 +126,11 @@ export class ClienteComponent implements OnInit {
       departamento: ['', [Validators.required]],
       municipio: ['', [Validators.required]],
       centroPoblado: ['', [Validators.required]],
-      sector: [this.sector[0]]
+      sector: [this.sector[0].indice]
     })
-    
+    this.servicioCliente();
     this.cambiarDMC();
+    this.validarIdentificacion();
   }
 
   guardarCrear() {
@@ -122,6 +172,7 @@ export class ClienteComponent implements OnInit {
       sector: [this.sector[0]]
     })
     this.cambiarDMC();
+    
   }
 
   guardarEditar() {
@@ -168,8 +219,30 @@ export class ClienteComponent implements OnInit {
       this.centroPoblado = centroPoblado;
     });
   }
+  servicioCliente(){
+    this.serviciosService.getCliente('https://felec.computec.com/clienteproducto/api/v1/clientes').subscribe( cliente =>{
+      this.cliente = cliente; 
+  });
 
-  //Seleccionar el primero del vector, prueba
+  }
+
+  servicioConsultaCliente(objeto){
+      this.serviciosService.postConsultaCliente('api/v1/clientes/consultar',objeto).subscribe( consulta =>{
+        
+        console.log(consulta);
+      
+    });
+  }
+
+  servicioCodigoCliente(){
+    this.serviciosService.getCodigo('https://felec.computec.com/clienteproducto/api/v1/cliente').subscribe( codigo =>{
+      
+      for (var key in codigo) {
+        this.cod = codigo['codigo'];
+     }
+    });
+  }
+
   cambiarDMC(){
     var val1 = this.departamento[0].codigo;
     var val2 = this.municipio[0].codigo;
@@ -219,7 +292,17 @@ export class ClienteComponent implements OnInit {
     return completo
   }
 
+  validarIdentificacion(){
+    this.forma.get('numeroIdentificacion').valueChanges.subscribe(valor =>{
+      for(var cli in this.cliente){
+            if(valor === this.cliente[cli].numeroIdentificacion){
+              console.log('encontre');
+            }
+            
+           }
+    });
+    
+  }
+
   
-  
- 
 }
