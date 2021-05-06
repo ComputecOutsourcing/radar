@@ -1,82 +1,90 @@
 <div class="animated fadeIn fast posicionPagina">
 
     <!--Filtro-->
-    <form class=" panel ">
+    <div class=" panel ">
         <h4>Filtros</h4>
-        <div class="row">
-            <div class="col col-4 ">
-                <label>Cliente</label>
-                <select class="form-select form-select-sm" type="text">
-                    <option *ngFor=" let cli of cliente " [value]="cli.codigo " (click)="servicioCliente()">
-                        {{cli.nombre|titlecase}}
+        <form [formGroup]="formaFiltro" (ngSubmit)='guardarFiltro()'>
+            <div class="row">
+
+                <div class="form-group col-6 ">
+                    <label>Cliente</label>
+                    <select class="form-select form-select-sm" formControlName="codigoCliente" (ngModelChange)="selectClie($event)">
+                        <option *ngFor=" let cli of cliente " [ngValue]="cli.codigoCliente">
+                            {{cli.descripcionCliente|titlecase}}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col col-6 ">
+                    <label>Producto</label>
+                    <select class="form-select form-select-sm" formControlName="codigoProducto">
+                    <option *ngFor=" let pro of producto " [ngValue]="pro.codigoProducto">
+                        {{pro.descripcionProducto|titlecase}}
                     </option>
                 </select>
+                </div>
+                <div class="col" align="right">
+                    <button type="submit" class="btn botonConsulta ">
+                        Consultar
+                    </button>
+                </div>
             </div>
-            <div class="col col-4 ">
-                <label>Producto</label>
-                <select class="form-select form-select-sm" type="text">
-                    <option *ngFor=" let pro of producto " [value]="pro.codigo ">
-                        {{pro.nombre|titlecase}}
-                    </option>
-                </select>
-            </div>
-            <div class="col col-2">
-                <label>Fecha Inicio</label>
-                <input type="date" class="form-control form-control-sm">
-            </div>
-            <div class="col col-2">
-                <label>Fecha Fin</label>
-                <input type="date" class="form-control form-control-sm">
-            </div>
-            <div class="col" align="right">
-                <button type="button" class="btn botonConsulta ">
-            Consultar
-        </button>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
     <!--Boton crear producto-->
     <div class="col" align="right" data-toggle="modal" data-target="#ventanaCrearSubproducto">
-        <button type="button" class="btn botonCrear" (click)="crearFormulario()">
+        <button type="button" class="btn botonCrear" (click)="abrirCrearFormulario()">
             Crear Subproducto
         </button>
     </div>
 
     <!--Tabla-->
 
-    <table class="table table-bordered posicionTabla table-sm">
+    <div class="mat-elevation-z8 posicionTabla ">
+        <h4 style="padding-left: 15px; padding-top: 10px;"> Resultados</h4>
+        <table mat-table [dataSource]="dataSource">
 
-        <thead class="table-secondary ">
-            <h4 style="padding-left: 15px;"> Resultados</h4>
-            <tr>
-                <th scope="col" class="text-center">Fecha de <br> Creación</th>
-                <th scope="col" class="text-center">Código de <br> Cliente</th>
-                <th scope="col" class="text-center">Razón Social</th>
-                <th scope="col" class="text-center">Código de Subproducto</th>
-                <th scope="col" class="text-center">Descripción de Subproducto</th>
-                <th scope="col" class="text-center">Estado</th>
-                <th scope="col" class="text-center">Editar</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="text-center">
-                <td>asdfghjklñ</td>
-                <td>asdfghjklñ</td>
-                <td>asdfghjklñ</td>
-                <td>asdfghjklñ</td>
-                <td>asdfghjklñ</td>
-                <td>asdfghjklñ</td>
+            <ng-container matColumnDef="codigoCliente">
+                <th mat-header-cell *matHeaderCellDef class="text-center negro tamanoLetraTabla"> Codigo <br> Cliente </th>
+                <td mat-cell *matCellDef="let element" class="text-center tamanoLetraTabla"> {{element.codigoCliente}} </td>
+            </ng-container>
 
-                <td class="text-center ">
-                    <button class="btn btn-success botonEditar" type="button" data-toggle="modal" data-target="#ventanaEditarSubproducto" (click)="editarFormulario()">
-                    <img  src="assets/icon/editar.png" />
-                </button>
+            <ng-container matColumnDef="razonSocial">
+                <th mat-header-cell *matHeaderCellDef class="text-center negro tamanoLetraTabla"> Razón <br> Social </th>
+                <td mat-cell *matCellDef="let element" class="text-center tamanoLetraTabla"> {{element.razonSocial}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="codigoSubproducto">
+                <th mat-header-cell *matHeaderCellDef class="text-center negro tamanoLetraTabla"> Codigo <br> Subproducto </th>
+                <td mat-cell *matCellDef="let element" class="text-center tamanoLetraTabla"> {{element.codigoSubproducto}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="descripcionSubproducto">
+                <th mat-header-cell *matHeaderCellDef class="text-center negro tamanoLetraTabla"> Descripción <br> Subproducto </th>
+                <td mat-cell *matCellDef="let element" class="text-center tamanoLetraTabla"> {{element.descripcion|titlecase}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef class="text-center negro tamanoLetraTabla"> Estado </th>
+                <td mat-cell *matCellDef="let element" class="text-center tamanoLetraTabla"> {{element.estado}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="editar">
+                <th mat-header-cell *matHeaderCellDef class="text-center negro"> Editar </th>
+                <td mat-cell *matCellDef="let element" class="text-center">
+                    <button class="btn btn-success botonEditar" type="button" data-toggle="modal" data-target="#ventanaEditarCliente" (click)="selectCli(element.codigo)">
+                        <img  src="assets/icon/editar.png" />
+                    </button>
                 </td>
-            </tr>
+            </ng-container>
 
-        </tbody>
-    </table>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator><br>
+    </div>
 
 
 </div>
@@ -90,48 +98,42 @@
 
             <div class="modal-body">
 
-                <form [formGroup]="forma" (ngSubmit)='guardarCrear()'>
+                <form [formGroup]="formaCrea" (ngSubmit)='guardarCrear()'>
 
                     <h5 id="tituloVentanaCrearSubproducto">Crear Subproducto</h5>
                     <hr class="linea">
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-6">
                             <label>Código Subproducto</label>
-                            <input class="form-control form-control-sm" type="text" formControlName="codigoSubproducto" [class.is-invalid]="codigoSubproductoNoValido">
+                            <fieldset disabled>
+                                <input class="form-control form-control-sm" type="text" formControlName="codigoSubproducto" [class.is-invalid]="codigoSubproductoNoValido">
+                            </fieldset>
                         </div>
-                        <div class="col-4">
-                            <label>Fecha de Creación</label>
-                            <input class="form-control form-control-sm" type="text" formControlName="fechaCreacion" [class.is-invalid]="fechaCreacionNoValido">
-                        </div>
-                        <div class="col-4">
+                        <div class="col-6">
                             <label>Estado</label>
-                            <input class="form-control form-control-sm" type="text" formControlName="estado" [class.is-invalid]="estadoNoValido">
+                            <fieldset disabled>
+                                <input class="form-control form-control-sm" type="text" formControlName="estado" [class.is-invalid]="estadoNoValido">
+                            </fieldset>
                         </div>
-                        <div class="form-group col-12">
+                        <div class="form-group col-12 ">
                             <label><span class="text-danger">*</span>Cliente</label>
-                            <select class="form-select form-select-sm" type="text" formControlName="cliente" [class.is-invalid]="clienteNoValido">
-                                <option *ngFor=" let cli of cliente " [value]="cli.codigo " (click)="servicioCliente()">
-                                    {{cli.nombre|titlecase}}
+                            <select class="form-select form-select-sm" formControlName="codigoCliente" (ngModelChange)="selectClie($event)">
+                                <option *ngFor=" let cli of cliente " [ngValue]="cli.codigoCliente">
+                                    {{cli.descripcionCliente|titlecase}}
                                 </option>
                             </select>
-                            <small *ngIf="clienteNoValido" class="text-danger">
-                                Diligenciar Campo
-                            </small>
                         </div>
-                        <div class="form-group col-12">
+                        <div class="col col-12 ">
                             <label><span class="text-danger">*</span>Producto</label>
-                            <select class="form-select form-select-sm" type="text" formControlName="producto" [class.is-invalid]="productoNoValido">
-                                <option *ngFor=" let pro of producto " [value]="pro.codigo ">
-                                    {{pro.nombre|titlecase}}
-                                </option>
-                            </select>
-                            <small *ngIf="productoNoValido" class="text-danger">
-                                Diligenciar Campo
-                            </small>
+                            <select class="form-select form-select-sm" formControlName="codigoProducto">
+                            <option *ngFor=" let pro of producto " [ngValue]="pro.codigoProducto">
+                                {{pro.descripcionProducto|titlecase}}
+                            </option>
+                        </select>
                         </div>
                         <div class="col-12">
                             <label><span class="text-danger">*</span>Descripción Subproducto</label>
-                            <input class="form-control form-control-sm" type="text" formControlName="descripcionSubproducto" [class.is-invalid]="descripcionSubproductoNoValido">
+                            <input class="form-control form-control-sm" type="text" formControlName="descripcion" [class.is-invalid]="descripcionSubproductoNoValido">
                             <small *ngIf="descripcionSubproductoNoValido" class="text-danger">
                                 Diligenciar Campo
                             </small>
@@ -142,7 +144,7 @@
 
                     <div class="form-group col-2">
                         <div class="input-group ">
-                            <button class="btn botonGuardar" type="submit">Guardar</button>
+                            <button class="btn botonGuardar" type="submit" [disabled]="!formaCrea.valid">Guardar</button>
                         </div>
                     </div>
                     <br>
@@ -159,7 +161,7 @@
 </div>
 
 <!-- Model para editar subproducto -->
-<div class="modal fade tamanoLetra " id="ventanaEditarSubproducto" tabindex="-1" role="dialog" aria-labelledby="tituloVentanaEditarSubproducto" aria-hidden="true">
+<!-- <div class="modal fade tamanoLetra " id="ventanaEditarSubproducto" tabindex="-1" role="dialog" aria-labelledby="tituloVentanaEditarSubproducto" aria-hidden="true">
 
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
 
@@ -233,4 +235,4 @@
 
         </div>
     </div>
-</div>
+</div> -->

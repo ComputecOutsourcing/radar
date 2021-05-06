@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, NumberValueAccessor, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { MatPaginator, } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { serviciosService } from '../../servicios/servicios.service';
+import { HttpClient } from '@angular/common/http';
 declare var $: any;
 
 
@@ -11,49 +14,45 @@ declare var $: any;
 })
 export class SubproductoComponent implements OnInit {
 
-  forma: FormGroup;
+  displayedColumns = ['codigoCliente','razonSocial','codigoSubproducto','descripcionSubproducto','estado','editar'];
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+
+  //CREA FORMULARIOS
+  formaFiltro: FormGroup;
+  formaCrea: FormGroup;
+  formaEdita: FormGroup;
+
+  //ARREGLOS
   cliente:any[] = [];
   producto:any[] = [];
+  cod:any;
+  datosConsulta;
+  dataSource;
+
   constructor(private fb: FormBuilder, private serviciosService:serviciosService) { 
-    this.nuevo();
     this.servicioCliente();
-    this.servicioProducto('0');
+    this.servicioCodigoSubproducto();
   }
 
   ngOnInit(): void {
+    this.filtro();
+    this.crearFormulario();
   }
 
-  nuevo(){
-    this.forma = this.fb.group({
-      codigoSubproducto: new FormControl ({value: '', disabled: true}, Validators.required),
-      fechaCreacion: new FormControl ({value: this.fechaActual(), disabled: true}, Validators.required),
-      estado: new FormControl ({value: '', disabled: true}, Validators.required),
-      cliente:'',
-      producto:'',
-      descripcionSubproducto:''
-    })
-  }
+  //FILTRO
 
-  //CREAR FORMULARIO
-
-  crearFormulario() {
-    this.forma.get('cliente').enable();
-    this.forma.get('producto').enable();
-      this.forma = this.fb.group({
-        codigoSubproducto: ['12345', [Validators.required]],
-        fechaCreacion: [this.fechaActual(), [Validators.required]],
-        estado: ['N', [Validators.required]],
-        cliente: ['', [Validators.required]],
-        producto: ['', [Validators.required]],
-        descripcionSubproducto: ['', [Validators.required]]
+  filtro() {
+    this.formaFiltro = this.fb.group(
+      {
+        codigoCliente: '',
+        codigoProducto: ''
       })
-      
-      this.cambiarProducto();
   }
 
-  guardarCrear() {
-    if (this.forma.invalid) {
-      return Object.values(this.forma.controls).forEach(control => {
+  guardarFiltro() {
+    if (this.formaFiltro.invalid) {
+      return Object.values(this.formaFiltro.controls).forEach(control => {
         if (control instanceof FormGroup) {
           Object.values(control.controls).forEach(control => control.markAsTouched());
         } else {
@@ -61,8 +60,35 @@ export class SubproductoComponent implements OnInit {
         }
       });
     }
-    console.log(this.forma.value);
-    this.cerrarCrear();
+    this.servicioConsultaSubproducto(this.formaFiltro.value);
+    console.log(this.formaFiltro.value);
+  }
+
+  //CREAR FORMULARIO
+
+  abrirCrearFormulario() {
+    this.crearFormulario();
+  }
+
+  crearFormulario() {
+    this.formaCrea = this.fb.group({
+      codigoSubproducto: [this.cod, [Validators.required]],
+      estado: ['N', [Validators.required]],
+      codigoCliente: ['', [Validators.required]],
+      codigoProducto: ['', [Validators.required]],
+      descripcion: ['', [Validators.required]]
+    })
+      
+  }
+
+  guardarCrear(): void{
+    if(this.formaCrea.valid){
+      this.formaCrea.get('descripcion').setValue(this.formaCrea.get('descripcion').value.toUpperCase());
+      console.log(this.formaCrea.value);
+      this.servicioCreaSubproducto(this.formaCrea.value);
+      this.cerrarCrear();
+      this.servicioCodigoSubproducto();
+    }
   }
 
   cerrarCrear() {
@@ -73,9 +99,9 @@ export class SubproductoComponent implements OnInit {
   //EDITAR FORMULARIO
 
   editarFormulario() {
-    this.forma.get('cliente').disable();
-    this.forma.get('producto').disable();
-      this.forma = this.fb.group({
+    this.formaEdita.get('cliente').disable();
+    this.formaEdita.get('producto').disable();
+      this.formaEdita = this.fb.group({
         codigoSubproducto: ['67890', [Validators.required]],
         fechaCreacion: [this.fechaActual(), [Validators.required]],
         estado: ['N', [Validators.required]],
@@ -84,12 +110,12 @@ export class SubproductoComponent implements OnInit {
         descripcionSubproducto: ['', [Validators.required]]
       })
       
-      this.cambiarProducto();
+      //this.cambiarProducto();
   }
 
   guardarEditar() {
-    if (this.forma.invalid) {
-      return Object.values(this.forma.controls).forEach(control => {
+    if (this.formaEdita.invalid) {
+      return Object.values(this.formaEdita.controls).forEach(control => {
         if (control instanceof FormGroup) {
           Object.values(control.controls).forEach(control => control.markAsTouched());
         } else {
@@ -97,7 +123,7 @@ export class SubproductoComponent implements OnInit {
         }
       });
     }
-    console.log(this.forma.value);
+    console.log(this.formaEdita.value);
     this.cerrarEditar();
   }
 
@@ -106,27 +132,49 @@ export class SubproductoComponent implements OnInit {
     $('#ventanaEditarSubproducto').modal('hide');
   }
 
+  //EVENTOS
+
+  selectClie(e){
+  this.servicioProducto(e);
+  }
+
   //METODOS COMUNES
 
   cancelar(){}
 
-  servicioCliente(){
-    this.serviciosService.getCliente('https://felec.computec.com/clienteproducto/api/v1/clientes').subscribe( cliente =>{
-      this.cliente = cliente;
+  servicioCliente() {
+    this.serviciosService.getCliente2().subscribe(data => {
+      this.cliente = data;
+    });
+
+  }
+
+  servicioProducto(numCliente) {
+    this.serviciosService.getProducto2(numCliente).subscribe(product => {
+      console.log(product);
+      this.producto = product;
     });
   }
 
-  servicioProducto(numCliente){
-    console.log(numCliente);
-    this.serviciosService.getProducto('https://felec.computec.com/clienteproducto/api/v1/'+numCliente+'/productos ').subscribe( producto =>{
-      this.producto = producto;
+  servicioCodigoSubproducto() {
+    this.serviciosService.getCodigoCliente('https://felec.computec.com/clienteproducto/api/v1/subproducto').subscribe(codigo => {
+      for (var key in codigo) {
+        this.cod = codigo['codigoSubproducto'];
+      }
     });
   }
 
-  cambiarProducto(){
-    console.log('aca estoy');
-    this.forma.get('cliente').valueChanges.subscribe(valor =>{console.log(valor);
-      this.servicioProducto(valor);
+  servicioConsultaSubproducto(objeto) {
+    this.serviciosService.postConsultaCliente('api/v1/subproductos/consultar', objeto).subscribe(consulta => {
+      console.log('Respuesta Consulta',consulta);
+      this.datosConsulta = consulta;
+      this.dataSource = new MatTableDataSource(this.datosConsulta);
+      this.dataSource.paginator = this.paginator;
+    });
+  }
+
+  servicioCreaSubproducto(objeto) {
+    this.serviciosService.postCreaSubproducto('api/v1/subproducto', objeto).subscribe(consulta => {
     });
   }
 
@@ -144,11 +192,10 @@ export class SubproductoComponent implements OnInit {
   }
 
     //GET
-    get codigoSubproductoNoValido() { return this.forma.get('codigoSubproducto').invalid && this.forma.get('codigoSubproducto').touched; }
-    get fechaCreacionNoValido() { return this.forma.get('fechaCreacion').invalid && this.forma.get('fechaCreacion').touched; }
-    get estadoNoValido() { return this.forma.get('estado').invalid && this.forma.get('estado').touched; }
-    get clienteNoValido() { return this.forma.get('cliente').invalid && this.forma.get('cliente').touched; }
-    get productoNoValido() { return this.forma.get('producto').invalid && this.forma.get('producto').touched; }
-    get descripcionSubproductoNoValido() { return this.forma.get('descripcionSubproducto').invalid && this.forma.get('descripcionSubproducto').touched; }
+    get codigoSubproductoNoValido() { return this.formaCrea.get('codigoSubproducto').invalid && this.formaCrea.get('codigoSubproducto').touched; }
+    get estadoNoValido() { return this.formaCrea.get('estado').invalid && this.formaCrea.get('estado').touched; }
+    get clienteNoValido() { return this.formaCrea.get('codigoCliente').invalid && this.formaCrea.get('codigoCliente').touched; }
+    get productoNoValido() { return this.formaCrea.get('codigoProducto').invalid && this.formaCrea.get('codigoProducto').touched; }
+    get descripcionSubproductoNoValido() { return this.formaCrea.get('descripcion').invalid && this.formaCrea.get('descripcion').touched; }
 
 }

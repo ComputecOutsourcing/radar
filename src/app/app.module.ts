@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatTableModule} from '@angular/material/table';
 
 
 //Rutas
@@ -16,6 +18,7 @@ import { FooterComponent } from './componentes/footer/footer.component';
 import { ClienteComponent } from './componentes/cliente/cliente.component';
 import { ProductoComponent } from './componentes/producto/producto.component';
 import { SubproductoComponent } from './componentes/subproducto/subproducto.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,12 @@ import { SubproductoComponent } from './componentes/subproducto/subproducto.comp
     BrowserModule,
     app_routing,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule,
+    MatTableModule,
+    MatPaginatorModule,
+    BrowserAnimationsModule
+   
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -115,7 +115,7 @@
                         <div class="form-group col-9">
                             <label><span class="text-danger">*</span>Cliente</label>
                             <select class="form-select form-select-sm" type="text" formControlName="cliente" [class.is-invalid]="clienteNoValido">
-                                <option *ngFor=" let cli of cliente " [value]="cli.codigo " (click)="servicioCliente() ">
+                                <option *ngFor=" let cli of cliente " [value]="cli.codigo " (click)="servicioCliente()">
                                     {{cli.nombre|titlecase}}
                                 </option>
                             </select>
